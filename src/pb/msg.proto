@@ -1,0 +1,103 @@
+syntax = "proto3";
+package pb;
+option csharp_namespace = "Pb";
+
+// MsgID:1
+// 同步玩家本次登录ID 玩家登录后 由Server端主动生成玩家ID发送给客户端
+message SyncPid {
+  int32 Pid = 1;  // 服务器返回的玩家ID
+}
+
+// MsgID:2
+// 获取房间列表 发起者 client
+message ListRoom {
+  int32 Pid = 1;
+}
+
+// MsgID:3
+// 创建房间 发起者 client
+message CreatRoom {
+  int32 MaxX = 1; // 地图X大小
+  int32 CopiesX = 2; // X轴方向的份数
+  int32 MaxY = 3; // 地图Y大小
+  int32 CopiesY = 4; // Y轴方向的份数
+  int32 Pid = 5; // 房间成员Pid
+  string RoomName = 6; // 房间名称
+}
+
+// MsgID:4
+// 加入房间 发起者 client
+message JoinRoom {
+  int32 Pid = 1;
+  string RoomName = 2;
+}
+
+// MsgID:5
+// 聊天 发起者Client
+message Chat {
+  int32 Tp = 1;           // 聊天类型 1 世界 2 房间 3 单人
+  string Content = 2;     // 聊天内容
+  int32 Pid = 3; // 聊天目标人群 tp = 1,2 不需要取该值 服务器根据发起者pid自行获取世界和房间的玩家列表 只有当tp = 3 即单人的时候需要获取聊天对象的pid
+}
+
+// MsgID:6
+// 开始游戏 发起者 client
+message Play {
+  string RoomName = 1;
+  repeated int32 Pid = 2;
+}
+
+// MsgID:7
+// 移动 发起者Client
+message Position {
+  float X = 1;
+  float Y = 2;
+  float Z = 3;
+  float V = 4;
+}
+
+
+// MsgID:8
+// 攻击 发起者 client
+
+
+// MsgID:9
+// 广播消息 发起者Server
+// Tp 消息类型 1 坐标 2 移动之后坐标信息更新
+message BroadCast {
+  int32 Pid = 1; // 发起者玩家ID
+  int32 Tp = 2; // 消息类型
+  oneof Data {  // 以下数据类型选其一
+    Position P = 4;
+  }
+}
+
+// MsgID:10
+// 同步玩家的显示数据
+message SyncPlayers {
+  repeated Player ps = 1;
+}
+// 玩家信息
+message Player {
+  int32 Pid = 1;
+  Position P = 2;
+}
+
+
+// MsgID:11
+// 同步房间列表信息
+message SyncRoomList {
+  repeated Room room = 1;
+}
+message Room {
+  int32 Pid = 1;
+  // TODO:扩展方向，发送房间大小，到时候决定是发送字符串描述大小还是发送房间的具体尺寸
+  string RoomName = 2;
+}
+
+// MsgID:12
+// 广播聊天信息
+message BroadCastChat {
+  int32 Pid = 1; // 发起者pid
+  string Content = 2; // 聊天内容
+}
